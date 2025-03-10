@@ -18,6 +18,7 @@ def generate_tts_audio(
     gender=None,
     pitch=None,
     speed=None,
+    seed=None,
     save_dir="example/results",
     segmentation_threshold=250,  # Do not go above this if you want to crash or you have better GPU
 ):
@@ -66,6 +67,7 @@ def generate_tts_audio(
                     gender=gender,
                     pitch=pitch,
                     speed=speed,
+                    seed=seed,
                 )
             wavs.append(wav)
         final_wav = np.concatenate(wavs, axis=0)
@@ -78,6 +80,7 @@ def generate_tts_audio(
                 gender=gender,
                 pitch=pitch,
                 speed=speed,
+                seed=seed,
             )
 
     # Save the generated audio.
@@ -89,26 +92,40 @@ def generate_tts_audio(
 # Example usage:
 if __name__ == "__main__":
     logging.basicConfig(
-        level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
-    )
+    level=logging.INFO,
+    format="%(asctime)s - %(levelname)s - %(message)s",
+    filename="tts_generation.log",  # Log file name
+    filemode="a"  # Append mode (use "w" to overwrite on each run)
+)
+
+    log = logging.getLogger(__name__)
+    console_handler = logging.StreamHandler()
+    console_handler.setLevel(logging.INFO)
+    formatter = logging.Formatter("%(asctime)s - %(levelname)s - %(message)s")
+    console_handler.setFormatter(formatter)
+    log.addHandler(console_handler)
+
+
+
+
 
     # Sample input (feel free to adjust)
     sample_text = (
         "The mind that opens to a new idea never returns to its original size. "
         "Hellstrom’s Hive: Chapter 1 – The Awakening. Mara Vance stirred from a deep, dreamless sleep, "
         "her consciousness surfacing like a diver breaking through the ocean's surface. "
-        # "A dim, amber light filtered through her closed eyelids, warm and pulsing softly. "
-        # "She hesitated to open her eyes, savoring the fleeting peace before reality set in. "
-        # "A cool, earthy scent filled her nostrils—damp soil mingled with something sweet and metallic. "
-        # "The air was thick, almost humid, carrying with it a faint vibration that resonated in her bones. "
-        # "It wasn't just a sound; it was a presence. "
-        # "Her eyelids fluttered open. Above her stretched a ceiling unlike any she'd seen—organic and alive, "
-        # "composed of interwoven tendrils that glowed with the same amber light. They pulsated gently, "
-        # "like the breathing of some colossal creature. Shadows danced between the strands, creating shifting patterns."
+        "A dim, amber light filtered through her closed eyelids, warm and pulsing softly. "
+        "She hesitated to open her eyes, savoring the fleeting peace before reality set in. "
+        "A cool, earthy scent filled her nostrils—damp soil mingled with something sweet and metallic. "
+        "The air was thick, almost humid, carrying with it a faint vibration that resonated in her bones. "
+        "It wasn't just a sound; it was a presence. "
+        "Her eyelids fluttered open. Above her stretched a ceiling unlike any she'd seen—organic and alive, "
+        "composed of interwoven tendrils that glowed with the same amber light. They pulsated gently, "
+        "like the breathing of some colossal creature. Shadows danced between the strands, creating shifting patterns."
     )
 
     # Call the function (adjust parameters as needed)
     output_file = generate_tts_audio(
-        sample_text, gender="female", pitch="moderate", speed="moderate",prompt_speech_path="./sample.wav", prompt_text="Make voice that is toddler."
+        sample_text[:10], gender="female",seed=42, pitch="moderate", speed="moderate", 
     )
     print("Generated audio file:", output_file)
