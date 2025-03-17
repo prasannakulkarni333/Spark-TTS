@@ -7,11 +7,11 @@ import soundfile as sf
 import logging
 from datetime import datetime
 from cli.SparkTTS import SparkTTS
-
+print("_________________________!!!!!!!!%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
 
 def generate_tts_audio(
     text,
-    model_dir="pretrained_models/Spark-TTS-0.5B",
+    model_dir=r"C:\Users\Prasanna\Documents\GitHub\Spark-TTS\pretrained_models\Spark-TTS-0.5B",
     device="cuda:0",
     prompt_speech_path=None,
     prompt_text=None,
@@ -19,8 +19,10 @@ def generate_tts_audio(
     pitch=None,
     speed=None,
     seed=None,
-    save_dir="example/results",
+    save_dir=r"C:\Users\Prasanna\Documents\GitHub\Spark-TTS\example\results",
     segmentation_threshold=250,  # Do not go above this if you want to crash or you have better GPU
+    prompt_audio=None,
+    filename=None
 ):
     """
     Generates TTS audio from input text, splitting into segments if necessary.
@@ -40,6 +42,12 @@ def generate_tts_audio(
     Returns:
         str: The unique file path where the generated audio is saved.
     """
+    import pathlib
+    model_dir = pathlib.WindowsPath(model_dir)
+    save_dir = pathlib.WindowsPath(save_dir)
+    model_dir = str(model_dir)
+    save_dir = str(save_dir)
+    # print("prompt_speech_path", prompt_speech_path)
     logging.info("Initializing TTS model...")
     device = torch.device(device)
     model = SparkTTS(model_dir, device)
@@ -48,6 +56,7 @@ def generate_tts_audio(
     os.makedirs(save_dir, exist_ok=True)
     timestamp = datetime.now().strftime("%Y%m%d%H%M%S")
     save_path = os.path.join(save_dir, f"{timestamp}.wav")
+    print(f"{save_dir}_________________________!!!!!!!!%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
 
     # Check if the text is too long.
     words = text.split()
@@ -84,6 +93,8 @@ def generate_tts_audio(
             )
 
     # Save the generated audio.
+    if filename:
+        save_path = os.path.join(save_dir, f"{filename}.wav")
     sf.write(save_path, final_wav, samplerate=16000)
     logging.info(f"Audio saved at: {save_path}")
     return save_path
@@ -124,8 +135,14 @@ if __name__ == "__main__":
         "like the breathing of some colossal creature. Shadows danced between the strands, creating shifting patterns."
     )
 
+    f_text = "Hi there everyone! I am a cloned voice. I belong to a new era of voice cloning technology."
+
     # Call the function (adjust parameters as needed)
     output_file = generate_tts_audio(
-        sample_text[:10], gender="female",seed=42, pitch="moderate", speed="moderate", 
+        sample_text, gender="female",seed=42, pitch="moderate", speed="moderate"
     )
+    # output_file = generate_tts_audio(
+    #     f_text, 
+    #     # prompt_speech_path="./output.wav",
+    # )
     print("Generated audio file:", output_file)
