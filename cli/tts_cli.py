@@ -100,7 +100,8 @@ def generate_tts_audio(
                     gender=gender,
                     pitch=pitch,
                     speed=speed,
-                    emotion=emotion
+                    emotion=emotion,
+                    seed=seed
                 )
             wavs.append(wav)
         final_wav = np.concatenate(wavs, axis=0)
@@ -113,7 +114,8 @@ def generate_tts_audio(
                 gender=gender,
                 pitch=pitch,
                 speed=speed,
-                emotion=emotion
+                emotion=emotion,
+                seed=seed
             )
 
     sf.write(save_path, final_wav, samplerate=16000)

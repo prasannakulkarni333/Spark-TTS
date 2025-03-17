@@ -20,7 +20,7 @@ def generate_tts_audio(
     speed=None,
     seed=None,
     save_dir=r"C:\Users\Prasanna\Documents\GitHub\Spark-TTS\example\results",
-    segmentation_threshold=250,  # Do not go above this if you want to crash or you have better GPU
+    segmentation_threshold=350,  # Do not go above this if you want to crash or you have better GPU
     prompt_audio=None,
     filename=None
 ):
@@ -138,11 +138,38 @@ if __name__ == "__main__":
     f_text = "Hi there everyone! I am a cloned voice. I belong to a new era of voice cloning technology."
 
     # Call the function (adjust parameters as needed)
-    output_file = generate_tts_audio(
-        sample_text, gender="female",seed=42, pitch="moderate", speed="moderate"
-    )
+    import pathlib, os
+    path_vid = pathlib.Path(r"C:\Users\Prasanna\Documents\GitHub\pop_crawler\pop_crawler\pop_crawler\vids")
+
+    for root, dirs, files in os.walk(path_vid):
+        print("root",root)
+        print("dirs",dirs)
+        print("files",files)
+        text = ""
+        for file in files:
+            if file.endswith(".txt"):
+                with open(os.path.join(root, file), "r") as f:
+                    sample_text = f.read()
+                    text = text + ". " +sample_text
+        print("tststgsetswt",text)
+        if text:
+            import subprocess
+            # python tts_cli.py --text "Let's test some voice features." --gender female --pitch high --emotion HAPPY --seed 42
+            # subprocess.run([f"python tts_cli.py --text {text} --gender female --pitch high --emotion HAPPY --seed 42 --save_dir {root}"], shell=True)
+            output_file = generate_tts_audio(
+                text,
+                gender="female",
+                seed=42,
+                pitch="moderate",
+                speed="moderate",
+                save_dir=root
+            )
+
+    # output_file = generate_tts_audio(
+    #     sample_text, gender="female",seed=42, pitch="moderate", speed="moderate"
+    # )
     # output_file = generate_tts_audio(
     #     f_text, 
     #     # prompt_speech_path="./output.wav",
     # )
-    print("Generated audio file:", output_file)
+    # print("Generated audio file:", output_file)
