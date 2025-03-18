@@ -107,7 +107,7 @@ def generate_tts_audio(
         final_wav = np.concatenate(wavs, axis=0)
     else:
         with torch.no_grad():
-            final_wav = model.inference(
+            final_wav = model.inference_standalone(
                 text,
                 prompt_speech_path,
                 prompt_text=prompt_text,

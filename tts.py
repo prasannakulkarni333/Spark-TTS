@@ -20,7 +20,7 @@ def generate_tts_audio(
     speed=None,
     seed=None,
     save_dir=r"C:\Users\Prasanna\Documents\GitHub\Spark-TTS\example\results",
-    segmentation_threshold=350,  # Do not go above this if you want to crash or you have better GPU
+    segmentation_threshold=450,  # Do not go above this if you want to crash or you have better GPU
     prompt_audio=None,
     filename=None
 ):
@@ -120,23 +120,7 @@ if __name__ == "__main__":
 
 
 
-    # Sample input (feel free to adjust)
-    sample_text = (
-        "The mind that opens to a new idea never returns to its original size. "
-        "Hellstrom’s Hive: Chapter 1 – The Awakening. Mara Vance stirred from a deep, dreamless sleep, "
-        "her consciousness surfacing like a diver breaking through the ocean's surface. "
-        "A dim, amber light filtered through her closed eyelids, warm and pulsing softly. "
-        "She hesitated to open her eyes, savoring the fleeting peace before reality set in. "
-        "A cool, earthy scent filled her nostrils—damp soil mingled with something sweet and metallic. "
-        "The air was thick, almost humid, carrying with it a faint vibration that resonated in her bones. "
-        "It wasn't just a sound; it was a presence. "
-        "Her eyelids fluttered open. Above her stretched a ceiling unlike any she'd seen—organic and alive, "
-        "composed of interwoven tendrils that glowed with the same amber light. They pulsated gently, "
-        "like the breathing of some colossal creature. Shadows danced between the strands, creating shifting patterns."
-    )
-
-    f_text = "Hi there everyone! I am a cloned voice. I belong to a new era of voice cloning technology."
-
+ 
     # Call the function (adjust parameters as needed)
     import pathlib, os
     path_vid = pathlib.Path(r"C:\Users\Prasanna\Documents\GitHub\pop_crawler\pop_crawler\pop_crawler\vids")
@@ -153,11 +137,13 @@ if __name__ == "__main__":
                     text = text + ". " +sample_text
         print("tststgsetswt",text)
         if text:
+            no_of_words = len(text.split())
+            print("no_of_words",no_of_words)
             import subprocess
             # python tts_cli.py --text "Let's test some voice features." --gender female --pitch high --emotion HAPPY --seed 42
             # subprocess.run([f"python tts_cli.py --text {text} --gender female --pitch high --emotion HAPPY --seed 42 --save_dir {root}"], shell=True)
             output_file = generate_tts_audio(
-                text,
+                str(no_of_words) + text,
                 gender="female",
                 seed=42,
                 pitch="moderate",

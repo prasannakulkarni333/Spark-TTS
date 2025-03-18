@@ -176,7 +176,79 @@ class SparkTTS:
         ]
 
         return "".join(control_tts_inputs)
+    
+    import torch
+    import numpy as np
+    import re
 
+    @torch.no_grad()
+    def inference_standalone(
+        text: str,
+        prompt: str,
+        tokenizer,
+        model,
+        audio_tokenizer,
+        device=torch.device("cuda:0"),
+        seed: int = None,
+        temperature: float = 0.8,
+        top_k: float = 50,
+        top_p: float = 0.95,
+        use_control_prompt: bool = False,
+        global_token_ids: torch.Tensor = None
+    ) -> torch.Tensor:
+        """
+        Standalone SparkTTS inference function without class dependencies.
+        """
+        if seed is not None:
+            torch.manual_seed(seed)
+            np.random.seed(seed)
+            if torch.cuda.is_available():
+                torch.cuda.manual_seed_all(seed)
+
+        model_inputs = tokenizer([prompt], return_tensors="pt").to(device)
+
+        if tokenizer.pad_token_id is None:
+            tokenizer.pad_token_id = tokenizer.eos_token_id or 0
+
+        generated_ids = model.generate(
+            **model_inputs,
+            max_new_tokens=3000,
+            do_sample=True,
+            top_k=top_k,
+            top_p=top_p,
+            temperature=temperature,
+            pad_token_id=tokenizer.pad_token_id
+        )
+
+        generated_ids = [
+            output_ids[len(input_ids):]
+            for input_ids, output_ids in zip(model_inputs.input_ids, generated_ids)
+        ]
+
+        predicts = tokenizer.batch_decode(generated_ids, skip_special_tokens=True)[0]
+
+        pred_semantic_ids = (
+            torch.tensor([int(token) for token in re.findall(r"bicodec_semantic_(\d+)", predicts)])
+            .long()
+            .unsqueeze(0)
+        )
+
+        if use_control_prompt:
+            global_token_ids = (
+                torch.tensor([int(token) for token in re.findall(r"bicodec_global_(\d+)", predicts)])
+                .long()
+                .unsqueeze(0)
+                .unsqueeze(0)
+            )
+        elif global_token_ids is None:
+            raise ValueError("global_token_ids must be provided if not using control prompt.")
+
+        wav = audio_tokenizer.detokenize(
+            global_token_ids.to(device).squeeze(0),
+            pred_semantic_ids.to(device),
+        )
+
+        return wav
 
     @torch.no_grad()
     def inference(
